@@ -1,0 +1,1421 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RMHL - Reborn Mixed Hockey League</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Orbitron:wght@600;800;900&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              red: '#ff2a4b',
+              darkred: '#990011',
+              darkBg: '#090b10',
+              cardBg: '#121620',
+              border: '#1f293d',
+            },
+            teams: {
+              boston: '#52C3FC',
+              arizona: '#C7010D',
+              alabama: '#6C0316',
+              sandiego: '#FEC607',
+              lasvegas: '#AB6FF0',
+              kentucky: '#006898',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Orbitron', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #090b10;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1f293d;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #ff2a4b;
+    }
+
+    .glow-red {
+      box-shadow: 0 0 20px rgba(255, 42, 75, 0.2);
+    }
+    .text-glow {
+      text-shadow: 0 0 10px rgba(255, 42, 75, 0.5);
+    }
+    
+    .cyber-grid {
+      background-size: 30px 30px;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+    }
+
+    .card-hover-lift {
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+    .card-hover-lift:hover {
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body class="bg-[#090b10] text-gray-100 font-sans min-h-screen flex flex-col cyber-grid antialiased selection:bg-[#ff2a4b] selection:text-white">
+
+  <!-- Navigation Header -->
+  <header class="sticky top-0 z-40 bg-[#090b10]/95 backdrop-blur-md border-b border-[#1f293d]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16 sm:h-20">
+        
+        <!-- Logo -->
+        <div class="flex items-center space-x-2.5 sm:space-x-3 cursor-pointer group" onclick="switchTab('home')">
+          <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-[#ff2a4b] to-[#990011] flex items-center justify-center text-white shadow-lg group-hover:scale-105 transition-transform">
+            <i class="fa-solid fa-hockey-puck text-sm sm:text-lg"></i>
+          </div>
+          <span class="font-display font-black text-lg sm:text-xl tracking-wider uppercase text-white">
+            RMHL <span class="text-[#ff2a4b]">Hockey</span>
+          </span>
+        </div>
+
+        <!-- Desktop Navigation Buttons -->
+        <nav class="hidden md:flex space-x-1 lg:space-x-2">
+          <button onclick="switchTab('home')" id="nav-home" class="nav-btn px-3.5 py-2 rounded-lg font-medium text-xs lg:text-sm transition-all duration-200 text-white bg-[#ff2a4b]/20 border border-[#ff2a4b]/40">
+            <i class="fa-solid fa-house mr-2 text-[#ff2a4b]"></i>Home
+          </button>
+          <button onclick="switchTab('standings')" id="nav-standings" class="nav-btn px-3.5 py-2 rounded-lg font-medium text-xs lg:text-sm transition-all duration-200 text-gray-400 hover:text-white hover:bg-gray-800/50">
+            <i class="fa-solid fa-list-ol mr-2"></i>Standings
+          </button>
+          <button onclick="switchTab('playoffs')" id="nav-playoffs" class="nav-btn px-3.5 py-2 rounded-lg font-medium text-xs lg:text-sm transition-all duration-200 text-gray-400 hover:text-white hover:bg-gray-800/50">
+            <i class="fa-solid fa-trophy mr-2"></i>Playoffs
+          </button>
+          <button onclick="switchTab('schedule')" id="nav-schedule" class="nav-btn px-3.5 py-2 rounded-lg font-medium text-xs lg:text-sm transition-all duration-200 text-gray-400 hover:text-white hover:bg-gray-800/50">
+            <i class="fa-solid fa-calendar-days mr-2"></i>Schedule
+          </button>
+          <button onclick="switchTab('media')" id="nav-media" class="nav-btn px-3.5 py-2 rounded-lg font-medium text-xs lg:text-sm transition-all duration-200 text-gray-400 hover:text-white hover:bg-gray-800/50">
+            <i class="fa-solid fa-newspaper mr-2"></i>Media
+          </button>
+        </nav>
+
+        <!-- Mobile Menu Button -->
+        <div class="flex md:hidden">
+          <button id="mobile-menu-btn" onclick="toggleMobileMenu()" class="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 focus:outline-none">
+            <i class="fa-solid fa-bars text-lg"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Navigation Menu -->
+    <div id="mobile-menu" class="hidden md:hidden border-t border-[#1f293d] bg-[#090b10] px-4 pt-2 pb-4 space-y-1">
+      <button onclick="switchTab('home')" class="mobile-nav-btn w-full text-left px-4 py-2.5 rounded-lg font-medium text-sm text-white bg-[#ff2a4b]/20">
+        <i class="fa-solid fa-house mr-3 text-[#ff2a4b]"></i>Home
+      </button>
+      <button onclick="switchTab('standings')" class="mobile-nav-btn w-full text-left px-4 py-2.5 rounded-lg font-medium text-sm text-gray-300 hover:bg-gray-800">
+        <i class="fa-solid fa-list-ol mr-3 text-gray-400"></i>Standings
+      </button>
+      <button onclick="switchTab('playoffs')" class="mobile-nav-btn w-full text-left px-4 py-2.5 rounded-lg font-medium text-sm text-gray-300 hover:bg-gray-800">
+        <i class="fa-solid fa-trophy mr-3 text-gray-400"></i>Playoffs
+      </button>
+      <button onclick="switchTab('schedule')" class="mobile-nav-btn w-full text-left px-4 py-2.5 rounded-lg font-medium text-sm text-gray-300 hover:bg-gray-800">
+        <i class="fa-solid fa-calendar-days mr-3 text-gray-400"></i>Schedule
+      </button>
+      <button onclick="switchTab('media')" class="mobile-nav-btn w-full text-left px-4 py-2.5 rounded-lg font-medium text-sm text-gray-300 hover:bg-gray-800">
+        <i class="fa-solid fa-newspaper mr-3 text-gray-400"></i>Media
+      </button>
+    </div>
+  </header>
+
+  <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+
+    <!-- ================= TAB 1: HOME ================= -->
+    <section id="tab-home" class="tab-content space-y-8 sm:space-y-10">
+      
+      <!-- Hero Banner -->
+      <div class="relative overflow-hidden rounded-2xl border border-[#ff2a4b]/30 p-6 sm:p-8 md:p-12 shadow-2xl glow-red bg-gradient-to-r from-[#121620] via-[#090b10] to-[#1a080d]">
+        <div class="relative z-10 max-w-3xl space-y-3 sm:space-y-4">
+          <div class="inline-flex items-center space-x-2 px-2.5 py-1 rounded-full bg-[#ff2a4b]/20 border border-[#ff2a4b]/50 text-[#ff2a4b] text-[10px] sm:text-xs font-bold uppercase tracking-wider backdrop-blur-md">
+            <span class="w-2 h-2 rounded-full bg-[#ff2a4b] animate-ping"></span>
+            <span>Season 2 Postseason Live</span>
+          </div>
+          <h1 class="font-display text-2xl sm:text-4xl md:text-5xl font-black text-white tracking-tight uppercase leading-tight sm:leading-none">
+            Welcome to the <span class="text-[#ff2a4b] text-glow">RMHL</span>
+          </h1>
+          <div class="flex flex-wrap gap-3 pt-2">
+            <button onclick="switchTab('schedule')" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#ff2a4b] to-[#990011] text-white font-bold text-xs sm:text-sm hover:shadow-lg hover:shadow-[#ff2a4b]/40 transition transform active:scale-95">
+              <i class="fa-solid fa-calendar mr-2"></i> View Schedule
+            </button>
+            <button onclick="switchTab('standings')" class="px-5 py-2.5 rounded-xl bg-[#121620]/80 hover:bg-gray-800 text-gray-200 border border-[#1f293d] font-semibold text-xs sm:text-sm backdrop-blur-md transition">
+              <i class="fa-solid fa-chart-simple mr-2 text-[#ff2a4b]"></i> Current Standings
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Featured Games Section: Game 6 Finals & Game 7 Preview -->
+      <div class="space-y-6">
+        <!-- Game 6 Finals -->
+        <div class="space-y-4">
+          <div class="flex items-center justify-between border-b border-[#1f293d] pb-3">
+            <h2 class="font-display text-base sm:text-xl font-bold uppercase tracking-wider text-white flex items-center">
+              <i class="fa-solid fa-square-poll-vertical text-emerald-400 mr-2.5"></i> Game 7 Final Score
+            </h2>
+            <button onclick="switchTab('schedule')" class="text-xs text-[#ff2a4b] hover:underline shrink-0">Full Schedule</button>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6" id="home-game3-results">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+
+        <!-- Game 7 Previews -->
+        <div class="space-y-4 pt-2">
+          <div class="flex items-center justify-between border-b border-[#1f293d] pb-3">
+            <h2 class="font-display text-base sm:text-xl font-bold uppercase tracking-wider text-white flex items-center">
+              <i class="fa-solid fa-fire text-[#ff2a4b] mr-2.5"></i> Grand Finals Game 1 Preview
+            </h2>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6" id="home-game4-previews">
+            <!-- Populated dynamically -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Playoff News Section -->
+      <div class="space-y-4 sm:space-y-6 pt-2">
+        <div class="flex items-center justify-between border-b border-[#1f293d] pb-3">
+          <div>
+            <h2 class="font-display text-base sm:text-xl font-bold uppercase tracking-wider text-white flex items-center">
+              <i class="fa-solid fa-newspaper text-[#ff2a4b] mr-2.5"></i> Playoff Headlines & Analysis
+            </h2>
+            <p class="text-xs text-gray-400 mt-0.5 hidden sm:block">Latest news and game recaps. Click any card to read.</p>
+          </div>
+          <button onclick="switchTab('media')" class="text-xs text-[#ff2a4b] hover:underline shrink-0">View All Media &rarr;</button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6" id="home-articles-container">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= TAB 2: STANDINGS ================= -->
+    <section id="tab-standings" class="tab-content hidden space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-[#1f293d] pb-4">
+        <div>
+          <h2 class="font-display text-xl sm:text-2xl font-black uppercase text-white flex items-center">
+            <i class="fa-solid fa-list-ol text-[#ff2a4b] mr-3"></i> League Standings
+          </h2>
+          <p class="text-gray-400 text-xs sm:text-sm mt-0.5">Official Regular Season Table • (RW - OTW - OTL - L)</p>
+        </div>
+        <div class="text-[11px] sm:text-xs text-gray-400 bg-[#121620] px-3 py-1.5 rounded-lg border border-[#1f293d] self-start sm:self-auto">
+          <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 mr-1.5"></span> Top 4 Advance to Playoffs
+        </div>
+      </div>
+
+      <div class="overflow-x-auto rounded-xl border border-[#1f293d] bg-[#121620] shadow-xl">
+        <table class="w-full text-left border-collapse min-w-[600px]">
+          <thead>
+            <tr class="bg-[#090b10] border-b border-[#1f293d] text-[11px] sm:text-xs font-semibold text-gray-400 uppercase tracking-wider">
+              <th class="py-3 px-3 text-center">RK</th>
+              <th class="py-3 px-4">Team</th>
+              <th class="py-3 px-2 text-center">GP</th>
+              <th class="py-3 px-2 text-center">RW</th>
+              <th class="py-3 px-2 text-center">OTW</th>
+              <th class="py-3 px-2 text-center">OTL</th>
+              <th class="py-3 px-2 text-center">L</th>
+              <th class="py-3 px-4 text-center font-bold text-[#ff2a4b]">PTS</th>
+            </tr>
+          </thead>
+          <tbody id="standings-table-body" class="divide-y divide-[#1f293d]/60 text-xs sm:text-sm font-medium">
+            <!-- Populated dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ================= TAB 3: PLAYOFFS ================= -->
+    <section id="tab-playoffs" class="tab-content hidden space-y-6 sm:space-y-8">
+      <div class="border-b border-[#1f293d] pb-4">
+        <h2 class="font-display text-xl sm:text-2xl font-black uppercase text-white flex items-center">
+          <i class="fa-solid fa-trophy text-[#ff2a4b] mr-3"></i> RMHL Championship Bracket
+        </h2>
+        <p class="text-gray-400 text-xs sm:text-sm mt-0.5">Semifinals & Championship Series • Click any matchup to view the full 7-game series overview</p>
+      </div>
+
+      <div class="overflow-x-auto pb-4">
+        <div class="min-w-[700px] md:min-w-full grid grid-cols-2 gap-6 lg:gap-12 items-center">
+          
+          <!-- SEMI FINALS -->
+          <div class="space-y-6">
+            <h3 class="font-display text-[11px] sm:text-xs font-bold text-gray-400 uppercase tracking-widest text-center">Semifinals (Best of 7)</h3>
+            
+            <!-- SD vs ARI -->
+            <div onclick="openSeriesOverview('sd_ari')" class="card-hover-lift bg-[#121620] rounded-xl border border-emerald-500/50 overflow-hidden shadow-lg hover:border-emerald-400 cursor-pointer transition">
+              <div class="p-3.5 bg-[#FEC607]/10 border-l-4 border-[#FEC607] flex justify-between items-center text-xs sm:text-sm">
+                <div class="flex items-center space-x-2.5">
+                  <span id="bracket-logo-sd"></span>
+                  <span class="font-bold text-white">#1 San Diego Suns</span>
+                </div>
+                <span class="font-mono font-black text-emerald-400 text-sm sm:text-base">4</span>
+              </div>
+              <div class="p-3.5 bg-[#C7010D]/10 border-l-4 border-[#C7010D] flex justify-between items-center text-xs sm:text-sm border-t border-[#1f293d]">
+                <div class="flex items-center space-x-2.5">
+                  <span id="bracket-logo-ari"></span>
+                  <span class="font-bold text-white">#4 Arizona Desert Dogs</span>
+                </div>
+                <span class="font-mono font-black text-gray-400 text-sm sm:text-base">0</span>
+              </div>
+              <div class="bg-emerald-950/40 px-3 py-1.5 border-t border-[#1f293d] text-[10px] sm:text-[11px] font-semibold text-emerald-400 text-center uppercase tracking-wider flex items-center justify-between">
+                <span>San Diego wins series 4-0 • Advances to Finals</span>
+                <span class="text-[#ff2a4b] text-[10px] underline">Series Hub &rarr;</span>
+              </div>
+            </div>
+
+            <!-- BOS vs KY -->
+            <div onclick="openSeriesOverview('bos_ky')" class="card-hover-lift bg-[#121620] rounded-xl border border-emerald-500/50 overflow-hidden shadow-lg hover:border-emerald-400 cursor-pointer transition">
+              <div class="p-3.5 bg-[#52C3FC]/10 border-l-4 border-[#52C3FC] flex justify-between items-center text-xs sm:text-sm">
+                <div class="flex items-center space-x-2.5">
+                  <span id="bracket-logo-bos"></span>
+                  <span class="font-bold text-white">#3 Boston Bay Bandits</span>
+                </div>
+                <span class="font-mono font-black text-gray-400 text-sm sm:text-base">3</span>
+              </div>
+              <div class="p-3.5 bg-[#006898]/10 border-l-4 border-[#006898] flex justify-between items-center text-xs sm:text-sm border-t border-[#1f293d]">
+                <div class="flex items-center space-x-2.5">
+                  <span id="bracket-logo-ky"></span>
+                  <span class="font-bold text-white">#2 Kentucky Mustangs</span>
+                </div>
+                <span class="font-mono font-black text-emerald-400 text-sm sm:text-base">4</span>
+              </div>
+              <div class="bg-emerald-950/40 px-3 py-1.5 border-t border-[#1f293d] text-[10px] sm:text-[11px] font-semibold text-emerald-400 text-center uppercase tracking-wider flex items-center justify-between">
+                <span>Kentucky wins series 4-3 • Advances to Finals</span>
+                <span class="text-[#ff2a4b] text-[10px] underline">Series Hub &rarr;</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- FINALS -->
+          <div class="space-y-6">
+            <h3 class="font-display text-[11px] sm:text-xs font-bold text-[#ff2a4b] uppercase tracking-widest text-center">Grand Finals</h3>
+            
+            <div onclick="openSeriesOverview('gf')" class="relative overflow-hidden bg-gradient-to-br from-[#121620] to-[#1a101f] rounded-2xl border-2 border-[#ff2a4b] p-5 sm:p-6 text-center space-y-3 sm:space-y-4 shadow-2xl glow-red cursor-pointer card-hover-lift">
+              <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#ff2a4b]/20 border border-[#ff2a4b] flex items-center justify-center mx-auto text-[#ff2a4b]">
+                <i class="fa-solid fa-crown text-lg sm:text-xl"></i>
+              </div>
+              <div>
+                <span class="text-[10px] sm:text-xs font-bold text-[#ff2a4b] uppercase tracking-wider">Championship Series</span>
+                <h4 class="font-display text-base sm:text-lg font-black text-white uppercase mt-1">San Diego Suns vs. Kentucky Mustangs</h4>
+                <p class="text-[11px] sm:text-xs text-gray-400 mt-0.5">October 26 - November 1 • 7:30 PM</p>
+              </div>
+              <div class="pt-1">
+                <span class="px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-lg bg-[#ff2a4b] text-white font-bold text-[10px] sm:text-xs uppercase tracking-wider shadow-lg">
+                  View Finals Schedule &rarr;
+                </span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= TAB 4: SCHEDULE ================= -->
+    <section id="tab-schedule" class="tab-content hidden space-y-6">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#1f293d] pb-4">
+        <div>
+          <h2 class="font-display text-xl sm:text-2xl font-black uppercase text-white flex items-center">
+            <i class="fa-solid fa-calendar-days text-[#ff2a4b] mr-3"></i> League Schedule
+          </h2>
+          <p class="text-gray-400 text-xs sm:text-sm mt-0.5">Regular Season & Playoff Games • Click Any Game for Details</p>
+        </div>
+
+        <div class="flex flex-col sm:flex-row gap-2.5">
+          <!-- SEARCH BAR -->
+          <div class="relative">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-xs"></i>
+            <input type="text" id="schedule-search" onkeyup="filterScheduleSearch()" placeholder="Search team or game..." class="w-full sm:w-48 pl-8 pr-3 py-1.5 bg-[#121620] border border-[#1f293d] rounded-xl text-xs text-white focus:outline-none focus:border-[#ff2a4b] transition">
+          </div>
+
+          <!-- CATEGORY FILTERS -->
+          <div class="flex flex-wrap bg-[#121620] p-1 rounded-xl border border-[#1f293d] text-[11px] sm:text-xs font-semibold gap-1">
+            <button onclick="filterSchedule('all')" id="sched-filter-all" class="px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg bg-[#ff2a4b] text-white">All</button>
+            <button onclick="filterSchedule('semifinals')" id="sched-filter-semifinals" class="px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg text-gray-400 hover:text-white">Semifinals</button>
+            <button onclick="filterSchedule('finals')" id="sched-filter-finals" class="px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg text-gray-400 hover:text-white">Finals</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="space-y-4" id="schedule-container">
+        <!-- Rendered dynamically -->
+      </div>
+    </section>
+
+    <!-- ================= TAB 5: MEDIA ================= -->
+    <section id="tab-media" class="tab-content hidden space-y-6 sm:space-y-8">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#1f293d] pb-4">
+        <div>
+          <h2 class="font-display text-xl sm:text-2xl font-black uppercase text-white flex items-center">
+            <i class="fa-solid fa-newspaper text-[#ff2a4b] mr-3"></i> RMHL Media & Archives
+          </h2>
+          <p class="text-gray-400 text-xs sm:text-sm mt-0.5">Browse historical articles, game recaps, and previews across the season.</p>
+        </div>
+
+        <!-- MEDIA SEARCH BAR -->
+        <div class="relative w-full md:w-64">
+          <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 text-xs"></i>
+          <input type="text" id="media-search" onkeyup="filterMediaSearch()" placeholder="Search articles..." class="w-full pl-8 pr-3 py-2 bg-[#121620] border border-[#1f293d] rounded-xl text-xs text-white focus:outline-none focus:border-[#ff2a4b] transition">
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6" id="media-articles-grid">
+        <!-- Rendered dynamically -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ARTICLE MODAL - Z-INDEX 70 -->
+  <div id="article-modal" class="fixed inset-0 z-[70] flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md hidden transition-opacity overflow-y-auto">
+    <div class="bg-[#121620] border-2 border-[#1f293d] w-full max-w-2xl rounded-2xl p-6 sm:p-8 relative shadow-2xl space-y-5 my-auto">
+      
+      <button onclick="closeArticleModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white p-2 rounded-lg bg-gray-800/50 transition">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+
+      <div class="space-y-2.5 border-b border-[#1f293d] pb-4">
+        <div class="flex items-center space-x-3">
+          <span id="article-modal-tag" class="text-xs font-bold text-white bg-[#ff2a4b] px-2.5 py-1 rounded uppercase tracking-wider shadow-md">Game Recap</span>
+          <span id="article-modal-date" class="text-xs text-gray-400">October 18, 2026</span>
+        </div>
+        <h2 id="article-modal-title" class="font-display font-black text-xl sm:text-2xl text-white leading-tight">Article Title</h2>
+        <div id="article-modal-author" class="text-xs font-semibold text-gray-400">By RMHL Media</div>
+      </div>
+
+      <div class="py-2">
+        <p id="article-modal-body" class="text-sm sm:text-base text-gray-200 leading-relaxed font-normal whitespace-pre-line">
+          Article content goes here...
+        </p>
+      </div>
+
+      <div class="pt-2">
+        <button onclick="closeArticleModal()" class="w-full py-2.5 rounded-xl bg-gray-800 hover:bg-gray-700 font-bold text-xs sm:text-sm text-gray-200 transition">
+          Close Article
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SERIES OVERVIEW MODAL (BEST OF 7 HUB) - Z-INDEX 50 -->
+  <div id="series-modal" class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md hidden transition-opacity overflow-y-auto">
+    <div class="bg-[#121620] border-2 border-[#1f293d] w-full max-w-xl rounded-2xl p-5 sm:p-6 relative shadow-2xl space-y-5 my-auto">
+      
+      <button onclick="closeSeriesOverview()" class="absolute top-3.5 right-3.5 text-gray-400 hover:text-white p-1.5 rounded-lg bg-gray-800/50">
+        <i class="fa-solid fa-xmark text-base"></i>
+      </button>
+
+      <div class="text-center space-y-1">
+        <span class="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-[#ff2a4b]">Playoff Series Hub • Best of 7</span>
+        <h3 id="series-modal-title" class="font-display text-lg sm:text-xl font-black text-white uppercase">Series Overview</h3>
+        <p id="series-modal-lead" class="text-xs font-bold text-emerald-400 bg-emerald-950/40 py-1 px-3 rounded-lg border border-emerald-500/30 inline-block">San Diego leads series 2-0</p>
+      </div>
+
+      <!-- SERIES GAME LISTING -->
+      <div class="space-y-2.5 max-h-[60vh] overflow-y-auto pr-1" id="series-games-list">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <button onclick="closeSeriesOverview()" class="w-full py-2.5 rounded-xl bg-gray-800 hover:bg-gray-700 font-bold text-xs sm:text-sm text-gray-200 transition">
+        Close Series Hub
+      </button>
+
+    </div>
+  </div>
+
+  <!-- MATCH DETAILS MODAL - Z-INDEX 60 OVERLAYS SERIES HUB -->
+  <div id="match-modal" class="fixed inset-0 z-[60] flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md hidden transition-opacity overflow-y-auto">
+    <div class="bg-[#121620] border-2 border-[#1f293d] w-full max-w-lg rounded-2xl p-5 sm:p-6 relative shadow-2xl space-y-5 sm:space-y-6 my-auto">
+      
+      <button onclick="closeMatchPreview()" class="absolute top-3.5 right-3.5 text-gray-400 hover:text-white p-1.5 rounded-lg bg-gray-800/50">
+        <i class="fa-solid fa-xmark text-base"></i>
+      </button>
+
+      <div class="text-center">
+        <span id="modal-match-date" class="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-[#ff2a4b]">Upcoming Match Preview</span>
+        <h3 id="modal-series-info" class="font-display text-lg sm:text-xl font-black text-white uppercase mt-0.5">Match Details</h3>
+      </div>
+
+      <div class="flex items-center justify-between bg-[#090b10] p-4 sm:p-5 rounded-xl border border-[#1f293d]">
+        <div class="flex flex-col items-center text-center w-5/12">
+          <div id="modal-team-a-icon" class="mb-1.5">
+            A
+          </div>
+          <span id="modal-team-a-name" class="font-bold text-white text-xs sm:text-sm truncate w-full">Team A</span>
+          <span id="modal-score-a" class="font-display font-black text-2xl sm:text-3xl text-white mt-0.5 hidden">0</span>
+        </div>
+
+        <div class="flex flex-col items-center">
+          <span id="modal-vs-badge" class="text-xs sm:text-sm font-display font-black text-[#ff2a4b] uppercase tracking-widest mb-1">VS</span>
+          <span id="modal-status-badge" class="px-2 py-0.5 rounded bg-[#ff2a4b]/10 text-[#ff2a4b] text-[10px] font-bold uppercase border border-[#ff2a4b]/30">Scheduled</span>
+        </div>
+
+        <div class="flex flex-col items-center text-center w-5/12">
+          <div id="modal-team-b-icon" class="mb-1.5">
+            B
+          </div>
+          <span id="modal-team-b-name" class="font-bold text-white text-xs sm:text-sm truncate w-full">Team B</span>
+          <span id="modal-score-b" class="font-display font-black text-2xl sm:text-3xl text-gray-400 mt-0.5 hidden">0</span>
+        </div>
+      </div>
+
+      <!-- MODAL ODDS PROGRESS BAR -->
+      <div id="modal-odds-bar-container" class="space-y-1.5 hidden bg-[#090b10] p-3.5 rounded-xl border border-[#1f293d]">
+        <div class="flex justify-between text-xs font-bold">
+          <span id="modal-odds-team-a-lbl">Team A 50%</span>
+          <span id="modal-odds-team-b-lbl">Team B 50%</span>
+        </div>
+        <div class="w-full h-2.5 bg-gray-900 rounded-full overflow-hidden flex border border-gray-800">
+          <div id="modal-odds-bar-a" style="width: 50%;"></div>
+          <div id="modal-odds-bar-b" style="width: 50%;"></div>
+        </div>
+      </div>
+
+      <!-- BOXSCORE CONTAINER -->
+      <div id="modal-boxscore-container" class="space-y-2.5">
+        <h4 class="text-[11px] font-bold uppercase tracking-wider text-gray-400 text-center">Period Breakdown</h4>
+        <div class="overflow-x-auto rounded-lg border border-[#1f293d]">
+          <table class="w-full text-center text-xs">
+            <thead class="bg-[#090b10] text-gray-400 border-b border-[#1f293d]">
+              <tr id="modal-boxscore-headers">
+                <th class="py-2 px-3 text-left">Team</th>
+                <th class="py-2 px-2">1st</th>
+                <th class="py-2 px-2">2nd</th>
+                <th class="py-2 px-3">3rd</th>
+                <th class="py-2 px-3 font-bold text-white">TOT</th>
+              </tr>
+            </thead>
+            <tbody id="modal-boxscore-body" class="divide-y divide-[#1f293d]/50 font-mono font-medium">
+            </tbody>
+          </table>
+        </div>
+
+        <!-- LINK TO GAME RECAP ARTICLE -->
+        <div id="modal-article-link-container" class="hidden text-center pt-1">
+          <button id="modal-article-btn" class="w-full py-2 rounded-lg bg-[#ff2a4b]/20 hover:bg-[#ff2a4b]/30 text-[#ff2a4b] border border-[#ff2a4b]/40 text-xs font-bold transition flex items-center justify-center">
+            <i class="fa-solid fa-newspaper mr-2"></i> Read Full Game Recap Article &rarr;
+          </button>
+        </div>
+
+        <div id="modal-series-lead-text" class="text-center text-xs font-bold text-emerald-400 bg-emerald-950/40 py-2 rounded-lg border border-emerald-500/30">
+        </div>
+      </div>
+
+      <button onclick="closeMatchPreview()" class="w-full py-2.5 rounded-xl bg-gray-800 hover:bg-gray-700 font-bold text-xs sm:text-sm text-gray-200 transition">
+        Close Window
+      </button>
+
+    </div>
+  </div>
+
+  <footer class="border-t border-[#1f293d] bg-[#090b10] mt-12 sm:mt-16 py-6 sm:py-8">
+  </footer>
+
+  <script>
+    const TEAMS = {
+      SD: { name: 'San Diego Suns', abbr: 'SD', color: '#FEC607', textColor: '#000' },
+      ARI: { name: 'Arizona Desert Dogs', abbr: 'ARI', color: '#C7010D', textColor: '#fff' },
+      BOS: { name: 'Boston Bay Bandits', abbr: 'BOS', color: '#52C3FC', textColor: '#000' },
+      KY: { name: 'Kentucky Mustangs', abbr: 'KY', color: '#006898', textColor: '#fff' },
+      ALA: { name: 'Alabama Firehawks', abbr: 'ALA', color: '#6C0316', textColor: '#fff' },
+      LV: { name: 'Las Vegas Jokers', abbr: 'LV', color: '#AB6FF0', textColor: '#fff' },
+      TBD1: { name: 'Semifinalist 1', abbr: 'SF1', color: '#334155', textColor: '#fff' },
+      TBD2: { name: 'Semifinalist 2', abbr: 'SF2', color: '#334155', textColor: '#fff' }
+    };
+
+    function getTeamLogoSVG(abbr, color, textColor = '#fff', size = 'w-7 h-7 sm:w-8 sm:h-8') {
+      return `
+        <div class="${size} rounded-lg flex items-center justify-center font-display font-black text-xs shadow-md shrink-0" style="background: linear-gradient(135deg, ${color}, #090b10); color: ${textColor}; border: 1px solid ${color}80;">
+          ${abbr}
+        </div>
+      `;
+    }
+
+    function getDiagonalMatchSquareSVG(colorA, colorB, size = 'w-7 h-7 sm:w-8 sm:h-8') {
+      return `
+        <div class="${size} rounded-lg overflow-hidden shrink-0 shadow-md border border-white/20">
+          <svg viewBox="0 0 32 32" class="w-full h-full">
+            <polygon points="0,0 32,0 0,32" fill="${colorA}" />
+            <polygon points="32,0 32,32 0,32" fill="${colorB}" />
+          </svg>
+        </div>
+      `;
+    }
+
+    let standingsData = [
+      { code: 'SD', gp: 38, rw: 24, otw: 4, otl: 5, l: 5, pts: 85, note: '' },
+      { code: 'KY', gp: 38, rw: 21, otw: 3, otl: 2, l: 12, pts: 67, note: '' },
+      { code: 'BOS', gp: 46, rw: 12, otw: 5, otl: 10, l: 19, pts: 53, note: '' },
+      { code: 'ARI', gp: 38, rw: 12, otw: 3, otl: 4, l: 19, pts: 46, note: 'Wins tiebreaker (12 RW vs 11 RW)' },
+      { code: 'ALA', gp: 34, rw: 11, otw: 4, otl: 4, l: 15, pts: 46, note: '' },
+      { code: 'LV', gp: 38, rw: 12, otw: 3, otl: 3, l: 20, pts: 43, note: '' }
+    ];
+
+    let gamesData = {
+      'g1_sd_ari': {
+        id: 'g1_sd_ari', date: '10/17 • Game 1', stage: 'Semifinals • Game 1', cat: 'semifinals', seriesId: 'sd_ari',
+        teamA: 'SD', teamB: 'ARI', status: 'FINAL', winner: 'SD', seriesLead: 'San Diego leads series 4-0',
+        periodsA: [2, 0, 1], periodsB: [0, 0, 0], oddsA: null, oddsB: null, articleId: 1
+      },
+      'g1_bos_ky': {
+        id: 'g1_bos_ky', date: '10/17 • Game 1', stage: 'Semifinals • Game 1', cat: 'semifinals', seriesId: 'bos_ky',
+        teamA: 'BOS', teamB: 'KY', status: 'FINAL', winner: 'BOS', seriesLead: 'Boston leads series 3-1',
+        periodsA: [0, 1, 1], periodsB: [0, 0, 1], oddsA: null, oddsB: null, articleId: 2
+      },
+      'g2_ari_sd': {
+        id: 'g2_ari_sd', date: '10/18 • Game 2', stage: 'Semifinals • Game 2', cat: 'semifinals', seriesId: 'sd_ari',
+        teamA: 'SD', teamB: 'ARI', status: 'FINAL', winner: 'SD', seriesLead: 'San Diego leads series 4-0',
+        periodsA: [1, 4, 3], periodsB: [0, 0, 0], oddsA: null, oddsB: null, articleId: 4
+      },
+      'g2_bos_ky': {
+        id: 'g2_bos_ky', date: '10/18 • Game 2', stage: 'Semifinals • Game 2', cat: 'semifinals', seriesId: 'bos_ky',
+        teamA: 'BOS', teamB: 'KY', status: 'FINAL (2OT)', winner: 'BOS', seriesLead: 'Boston leads series 3-1',
+        periodsA: [0, 0, 0, 0, 1], periodsB: [0, 0, 0, 0, 0], oddsA: null, oddsB: null, articleId: 5
+      },
+      'g3_sd_ari': {
+        id: 'g3_sd_ari', date: '10/19 • Game 3', stage: 'Semifinals • Game 3', cat: 'semifinals', seriesId: 'sd_ari',
+        teamA: 'SD', teamB: 'ARI', status: 'FINAL', winner: 'SD', seriesLead: 'San Diego leads series 4-0',
+        periodsA: [1, 1, 2], periodsB: [1, 1, 0], oddsA: null, oddsB: null, articleId: 6
+      },
+      'g3_ky_bos': {
+        id: 'g3_ky_bos', date: '10/19 • Game 3', stage: 'Semifinals • Game 3', cat: 'semifinals', seriesId: 'bos_ky',
+        teamA: 'BOS', teamB: 'KY', status: 'FINAL', winner: 'BOS', seriesLead: 'Boston leads series 3-1',
+        periodsA: [1, 2, 0], periodsB: [1, 0, 1], oddsA: null, oddsB: null, articleId: 7
+      },
+      'g4_ari_sd': {
+        id: 'g4_ari_sd', date: '10/20 • Game 4', stage: 'Semifinals • Game 4', cat: 'semifinals', seriesId: 'sd_ari',
+        teamA: 'SD', teamB: 'ARI', status: 'FINAL', winner: 'SD', seriesLead: 'San Diego wins series 4-0 • Advances to Finals',
+        periodsA: [0, 3, 1], periodsB: [0, 0, 0], oddsA: null, oddsB: null, articleId: 9
+      },
+      'g4_bos_ky': {
+        id: 'g4_bos_ky', date: '10/20 • Game 4', stage: 'Semifinals • Game 4', cat: 'semifinals', seriesId: 'bos_ky',
+        teamA: 'KY', teamB: 'BOS', status: 'FINAL', winner: 'KY', seriesLead: 'Boston leads series 3-1',
+        periodsA: [0, 1, 1], periodsB: [0, 0, 0], oddsA: null, oddsB: null, articleId: 10
+      },
+      'g5_ky_bos': {
+        id: 'g5_ky_bos', date: '10/21 • Game 5', stage: 'Semifinals • Game 5', cat: 'semifinals', seriesId: 'bos_ky',
+        teamA: 'KY', teamB: 'BOS', status: 'FINAL (OT)', winner: 'KY', seriesLead: 'Boston leads series 3-2',
+        periodsA: [0, 0, 1, 1], periodsB: [1, 0, 0, 0], oddsA: null, oddsB: null, articleId: 11
+      },
+      'g6_bos_ky': {
+        id: 'g6_bos_ky', date: '10/24 • Game 6', stage: 'Semifinals • Game 6', cat: 'semifinals', seriesId: 'bos_ky',
+        teamA: 'KY', teamB: 'BOS', status: 'FINAL', winner: 'KY', seriesLead: 'Series tied 3-3 • Game 7 decides the series',
+        periodsA: [0, 0, 2], periodsB: [0, 0, 0], oddsA: null, oddsB: null, articleId: 13
+      },
+      'g7_ky_bos': {
+        id: 'g7_ky_bos', date: '10/25 • Game 7', stage: 'Semifinals • Game 7', cat: 'semifinals', seriesId: 'bos_ky',
+        teamA: 'KY', teamB: 'BOS', status: 'FINAL', winner: 'KY', seriesLead: 'Kentucky wins series 4-3 • Completes historic comeback',
+        periodsA: [0, 1, 0], periodsB: [0, 0, 0], oddsA: null, oddsB: null, articleId: 14
+      },
+      'gf_g1': {
+        id: 'gf_g1', date: '10/26 • Game 1', stage: 'Grand Finals • Game 1', cat: 'finals', seriesId: 'gf',
+        teamA: 'SD', teamB: 'KY', status: '7:30 PM', winner: null, seriesLead: 'Championship Series • Game 1 odds: 50/50',
+        periodsA: [0, 0, 0], periodsB: [0, 0, 0], oddsA: 50, oddsB: 50, articleId: 15
+      },
+      'gf_g2': {
+        id: 'gf_g2', date: '10/27 • Game 2', stage: 'Grand Finals • Game 2', cat: 'finals', seriesId: 'gf',
+        teamA: 'SD', teamB: 'KY', status: '7:30 PM', winner: null, seriesLead: 'Championship Series',
+        periodsA: [0, 0, 0], periodsB: [0, 0, 0], oddsA: null, oddsB: null, articleId: null
+      },
+      'gf_g3': {
+        id: 'gf_g3', date: '10/28 • Game 3', stage: 'Grand Finals • Game 3', cat: 'finals', seriesId: 'gf',
+        teamA: 'KY', teamB: 'SD', status: '7:30 PM', winner: null, seriesLead: 'Championship Series',
+        periodsA: [0, 0, 0], periodsB: [0, 0, 0], oddsA: null, oddsB: null, articleId: null
+      },
+      'gf_g4': {
+        id: 'gf_g4', date: '10/29 • Game 4', stage: 'Grand Finals • Game 4', cat: 'finals', seriesId: 'gf',
+        teamA: 'KY', teamB: 'SD', status: '7:30 PM', winner: null, seriesLead: 'Championship Series',
+        periodsA: [0, 0, 0], periodsB: [0, 0, 0], oddsA: null, oddsB: null, articleId: null
+      },
+      'gf_g5': {
+        id: 'gf_g5', date: '10/30 • Game 5*', stage: 'Grand Finals • Game 5', cat: 'finals', seriesId: 'gf',
+        teamA: 'SD', teamB: 'KY', status: '7:30 PM', winner: null, seriesLead: 'If Necessary',
+        periodsA: [0, 0, 0], periodsB: [0, 0, 0], oddsA: null, oddsB: null, articleId: null
+      },
+      'gf_g6': {
+        id: 'gf_g6', date: '10/31 • Game 6*', stage: 'Grand Finals • Game 6', cat: 'finals', seriesId: 'gf',
+        teamA: 'KY', teamB: 'SD', status: '7:30 PM', winner: null, seriesLead: 'Championship Series',
+        periodsA: [0, 0, 0], periodsB: [0, 0, 0], oddsA: null, oddsB: null, articleId: null
+      },
+      'gf_g7': {
+        id: 'gf_g7', date: '11/01 • Game 7*', stage: 'Grand Finals • Game 7', cat: 'finals', seriesId: 'gf',
+        teamA: 'SD', teamB: 'KY', status: '7:30 PM', winner: null, seriesLead: 'If Necessary',
+        periodsA: [0, 0, 0], periodsB: [0, 0, 0], oddsA: null, oddsB: null, articleId: null
+      }
+    };
+
+    let seriesData = {
+      'sd_ari': {
+        id: 'sd_ari', title: 'San Diego Suns vs. Arizona Desert Dogs',
+        lead: 'San Diego wins series 4-0 • Advances to Finals',
+        gameIds: ['g1_sd_ari', 'g2_ari_sd', 'g3_sd_ari', 'g4_ari_sd']
+      },
+      'bos_ky': {
+        id: 'bos_ky', title: 'Boston Bay Bandits vs. Kentucky Mustangs',
+        lead: 'Kentucky wins series 4-3 • Advances to the Grand Finals',
+        gameIds: ['g1_bos_ky', 'g2_bos_ky', 'g3_ky_bos', 'g4_bos_ky', 'g5_ky_bos', 'g6_bos_ky', 'g7_ky_bos']
+      },
+      'gf': {
+        id: 'gf', title: 'RMHL Grand Finals Series',
+        lead: 'Finals begin October 26 • Game 7, if necessary, November 1',
+        gameIds: ['gf_g1', 'gf_g2', 'gf_g3', 'gf_g4', 'gf_g5', 'gf_g6', 'gf_g7']
+      }
+    };
+
+    let articleData = {
+      1: {
+        id: 1, tag: "Game Recap", title: "San Diego's Total Dominance & Jack_717 Hat Trick",
+        author: "RMHL Media", snippet: "The top-seeded San Diego Suns put on a masterclass of absolute dominance...",
+        full: "The top-seeded San Diego Suns put on a masterclass of absolute dominance, cruising to a 3–0 shutout win over the Arizona Desert Dogs.\n\nJack_717 spearheaded this overwhelming performance by netting a brilliant hat trick, scoring twice in the first period and capping it off in the third.\n\nFrom start to finish, San Diego controlled the pace completely on both ends of the ice, leaving the Desert Dogs searching for answers against a suffocating Suns defense.",
+        date: "October 17, 2026"
+      },
+      2: {
+        id: 2, tag: "Upset Recap", title: "Boston Stuns Kentucky, Snapping 10-Game Win Streak",
+        author: "RMHL Media", snippet: "The postseason got off to a stunning start as the Boston Bay Bandits handed...",
+        full: "The postseason got off to a stunning start as the Boston Bay Bandits handed the Kentucky Mustangs a 2–1 defeat, snapping Kentucky's impressive 10-game win streak in a massive playoff upset.\n\nAfter a scoreless first period, Boston scored the first two goals of the game in the second and third periods before Kentucky managed to cut into the lead with a goal late in the third, but the Bandits held firm to secure the 2–1 victory and take a 1–0 series lead.",
+        date: "October 17, 2026"
+      },
+      3: {
+        id: 3, tag: "Game 2 Preview", title: "Coach Sm.14 Cleared to Play for Arizona",
+        author: "RMHL Media", snippet: "Following a game where the San Diego Suns showcased utter dominance...",
+        full: "Following a game where the San Diego Suns showcased utter dominance in a 3–0 shutout victory, the Arizona Desert Dogs received a massive boost ahead of Game 2.\n\nCoach Sm.14 has been officially allowed to step onto the ice and play for Arizona in the upcoming matchup.\n\nThis unexpected roster move injects a completely new dynamic into the Desert Dogs' lineup, setting the stage for a much closer battle as Arizona looks to counter San Diego's overwhelming strength and even the series.",
+        date: "October 17, 2026"
+      },
+      4: {
+        id: 4, tag: "Game 2 Recap", title: "San Diego destroys Arizona behind Sharky's 7 Goal Performance",
+        author: "RMHL Media", snippet: "The San Diego Suns delivered a historic performance in Game 2...",
+        full: "The San Diego Suns delivered a historic performance in Game 2, crushing the Arizona Desert Dogs 8–0 in a sheer display of offensive firepower.\n\nSharky took complete control of the game, putting together an unforgettable 7-goal performance that tore through the Desert Dogs' defensive structure from start to finish.\n\nWith an unrelenting attack and back-to-back shutouts in the postseason, San Diego now commands a 2–0 series lead with all the momentum on their side.",
+        date: "October 18, 2026"
+      },
+      5: {
+        id: 5, tag: "Game 2 Recap", title: "Boston Takes Shocking 2-0 Lead After a Double Overtime Classic",
+        author: "RMHL Media", snippet: "In an absolute thriller of a defensive battle, the Boston Bay Bandits...",
+        full: "In an absolute thriller of a defensive battle, the Boston Bay Bandits outlasted the Kentucky Mustangs 1–0 in double overtime to claim a commanding 2–0 series lead.\n\nGoaltender Wheels put on a legendary performance between the pipes, stopping all 42 shots he faced to earn a sensational double overtime shutout.\n\nTrizzy scored the game-winning goal to break the scoreless tie, giving Boston the victory and sending the Bandits two wins away from the Finals.",
+        date: "October 18, 2026"
+      },
+      6: {
+        id: 6, tag: "Game 3 Recap", title: "San Diego Keeps On Rolling, One Win From Finals",
+        author: "RMHL Media", snippet: "The Suns took Game 3 by a 4–2 score and moved within one win of another Finals appearance...",
+        full: "The San Diego Suns kept on rolling in Game 3, defeating the Arizona Desert Dogs 4–2 to take a commanding 3–0 lead in the semifinal series. San Diego is now just one win away from reaching its second straight Finals.\n\nThe Suns reached the Finals last season as well, but their run ended with a 4–1 series loss to Boston. Now, San Diego has a chance to return to the championship stage and get another shot at the title.",
+        date: "October 19, 2026"
+      },
+      7: {
+        id: 7, tag: "Game 3 Recap", title: "Kentucky's comeback falls short, Boston with a 3-0 lead",
+        author: "RMHL Media", snippet: "Kentucky made a late push, scoring in the final minute and nearly finding another, but Boston held on...",
+        full: "The Kentucky Mustangs' comeback fell just short in Game 3, as the Boston Bay Bandits held on for a 3–2 win and a commanding 3–0 series lead. Kentucky scored in the final minute and nearly found another goal moments later, putting real pressure on Boston before time ran out.\n\nBoston, the reigning champions, is now just one win away from returning to the Finals. That puts the Bandits in position to defend their title, despite Kentucky entering the series as the favorite. The Mustangs now face elimination and need a major turnaround to keep their season alive.",
+        date: "October 19, 2026"
+      },
+      8: {
+        id: 8, tag: "Series Analysis", title: "Déjà-vu in Season 2",
+        author: "RMHL Media", snippet: "Last season's San Diego–Boston Finals could be repeating itself, with both teams one win away...",
+        full: "Déjà-vu is starting to set in around the RMHL. Last season, the Finals featured San Diego against Boston, with the Bandits winning the championship in five games.\n\nThis year, the picture is looking familiar: San Diego and Boston are both one win away from advancing to the Finals again. If both teams finish the job, the league will get a rematch of last season's championship series.",
+        date: "October 19, 2026"
+      },
+      9: {
+        id: 9, tag: "Game 4 Recap", title: "San Diego completes the sweep of Arizona, returns to Finals",
+        author: "RMHL Media", snippet: "A four-game sweep, a huge three-goal surge, and a 19–2 series scoring advantage send San Diego back to the Finals...",
+        full: "The San Diego Suns completed the sweep of the Arizona Desert Dogs with a 4–0 Game 4 shutout, punching their ticket back to the RMHL Finals. San Diego's offense erupted for three goals in the second period before adding one more in the third to finish the job. Across the four games, the Suns outscored Arizona 19–2.\n\nGame 1 set the tone with a 3–0 San Diego win. In Game 2, the Suns' attack exploded for an 8–0 victory, building a commanding lead in the series. Game 3 was Arizona's closest fight, but San Diego still came away with a 4–2 win to move within one victory of the sweep. In Game 4, the Suns shut the door completely, winning 4–0 and completing a dominant four-game run.\n\nThe 19–2 aggregate scoring margin says it all: San Diego controlled the series at both ends of the ice. The Suns are headed back to the Finals, where they will await the winner of Boston and Kentucky.",
+        date: "October 20, 2026"
+      },
+      10: {
+        id: 10, tag: "Game 4 Recap", title: "Kentucky shuts out Boston, forces Game 5",
+        author: "RMHL Media", snippet: "Oil Country blanked the reigning champions to stay alive, but Kentucky still faces a long road back...",
+        full: "Kentucky answered with a crucial shutout, blanking the Boston Bay Bandits 2–0 in Game 4 and forcing a Game 5. Oil Country delivered the defensive performance it needed, keeping Boston off the scoreboard and refusing to let the reigning champions finish the series tonight.\n\nThe win cuts Boston's series lead to 3–1 and gives Kentucky a lifeline. The Mustangs have avoided elimination for now, but the road ahead remains long: they must win Game 5 just to extend the series, then keep winning from there to complete a comeback. Boston still has three chances to secure the series and return to the Finals, while Kentucky will need another near-perfect effort to save its season.",
+        date: "October 20, 2026"
+      },
+      11: {
+        id: 11, tag: "Game 5 Recap", title: "Kentucky Stays Alive in Overtime Comeback",
+        author: "RMHL Media", snippet: "Boston's early lead lasted into the third, but a late misplay and Skyz's overtime winner brought Kentucky within one...",
+        full: "The Kentucky Mustangs are not done yet. In a dramatic Game 5, Kentucky rallied from behind to defeat the Boston Bay Bandits 2–1 in overtime, cutting Boston's series lead to 3–2 and keeping its postseason hopes alive.\n\nBoston struck first in the opening period, taking a 1–0 lead and making it stand up through the second period. The Bandits looked in control, and as the third period began, Kentucky was running out of time to change the story of the game.\n\nThen, with just 4:45 remaining in the third, an unfortunate misplay gave Kentucky the opening it needed. The Mustangs capitalized to tie the game at one, turning what had looked like a Boston closeout into a tense finish. Kentucky had forced overtime, and suddenly the pressure was back on the reigning champions.\n\nIn overtime, Skyz delivered the decisive moment, scoring the game-winning goal to complete Kentucky's comeback and send Kentucky home with a crucial victory. One game earlier, Kentucky was facing a 3–1 series deficit; now the Mustangs have won twice in a row and pulled within one game of tying the series.\n\nThe road is still steep, but Kentucky's chances are becoming real. Boston remains ahead 3–2 and needs just one more win to advance, while Kentucky has momentum and a belief that seemed unlikely when it fell behind 3–0. Game 6 now becomes another must-win opportunity for Kentucky—and a chance to make this comeback even more remarkable.",
+        date: "October 21, 2026"
+      },
+      13: {
+        id: 13, tag: "Game 6 Recap", title: "Kentucky's Late Goal Forces RMHL's First Game 7",
+        author: "RMHL Media", snippet: "A defensive standoff, Vial's late breakthrough, and an empty-netter have Kentucky's historic comeback one win from completion...",
+        full: `The Kentucky Mustangs have done it: after falling behind 3–0 in the semifinal series, they have won three straight games and forced the first Game 7 in RMHL history. Kentucky shut out the Boston Bay Bandits 2–0 in Game 6, completing another tense chapter in a comeback that once looked almost impossible.
+
+Defense defined the opening stretch. Both teams played with urgency, protecting the middle of the ice and making every scoring chance difficult to find. Boston was trying to close out the series, while Kentucky knew one mistake could end its season. The result was a tight, physical defensive battle with neither side willing to give away an opening.
+
+Then, with just 3:36 remaining, Vial broke through for Kentucky. The late goal finally cracked the deadlock and sent the Mustangs' bench into celebration, but there was still work to do. Boston pushed desperately for an equalizer and came frighteningly close with 55 seconds left, putting Kentucky under enormous pressure as the Bandits searched for one last chance to end the comeback.
+
+Kentucky survived that scare and sealed the win with an empty-net goal, turning a narrow lead into a 2–0 final. The Mustangs had held firm defensively, found the decisive goal late, and made sure Boston could not force another twist.
+
+Now the comeback is nearly complete. Kentucky has erased a 3–0 deficit to tie the series 3–3, and one more win would deliver a turnaround no RMHL team has ever managed. Boston still has a chance to stop the run, but the series now comes down to one game: Game 7 on October 25. For the first time in league history, the RMHL will have a Game 7—and the Mustangs are one victory from making history.`,
+        date: "October 24, 2026"
+      },
+      12: {
+        id: 12, tag: "Series Analysis", title: "Make History or Be History: Kentucky Looking to do the Impossible",
+        author: "RMHL Media", snippet: "After a 10-game regular-season winning streak and a 3–0 series hole, Kentucky has made the impossible feel possible...",
+        full: "The Kentucky Mustangs are chasing a comeback that would make RMHL history. Kentucky finished the regular season in spectacular form, riding a 10-game winning streak to close out its campaign and entering the postseason with serious expectations. The Mustangs were viewed as the favorite in this series, but Boston quickly turned the script upside down.\n\nAfter three straight losses, Kentucky fell into a 3–0 hole—a position no RMHL team has ever overcome to win a series. The reigning champion Bandits were one victory away from advancing, and Kentucky's season appeared all but finished.\n\nBut the Mustangs refused to go quietly. First came the Game 4 shutout, which kept the season alive. Then came Game 5, when Kentucky overcame an early Boston lead, tied the game late in regulation, and won it in overtime on Skyz's game-winning goal. Two wins down, the Mustangs have cut the deficit to 3–2 and made the possibility of a historic comeback feel real.\n\nThe challenge remains enormous. No RMHL team has come back from 3–1, let alone 3–0, and Boston still needs only one victory to move on. Kentucky must win Game 6 to force a deciding seventh game, then finish the job under the pressure of an elimination series. The Mustangs have already done what once looked improbable by getting this far. Now they are looking to make history—or be history.",
+        date: "October 21, 2026"
+      },
+      14: {
+        id: 14, tag: "Game 7 Recap", title: "Kentucky Completes the Comeback of the Century",
+        author: "RMHL Media", snippet: "Down 0–3 and one loss from elimination, Kentucky won four straight, shut out Boston in Game 7, and punched its ticket to the Grand Finals...",
+        full: `The Kentucky Mustangs have completed one of the most remarkable turnarounds in RMHL history. After falling behind the Boston Bay Bandits 3–0 in the semifinal series, Kentucky won four consecutive elimination games to take the series 4–3 and earn a place in the Grand Finals against the San Diego Suns. The final chapter was fittingly tense: Kentucky defeated Boston 1–0 in Game 7, with Skyz scoring the decisive goal and Oil Country delivering the shutout.
+
+Skyz broke the scoreless tie with just 1:56 remaining in the second period. In a game where both teams knew one mistake could end the season, that single goal became the difference. Kentucky protected the lead through the third period, and Oil Country kept Boston off the board to finish the shutout. The Mustangs had survived the biggest test of their season and turned a 3–0 series deficit into a 4–3 victory.
+
+The defensive finish capped a stunning four-game stretch. Boston scored only one goal across the final four games of the series. Kentucky blanked the Bandits in Game 4, allowed one goal in its Game 5 overtime win, shut them out again in Game 6, and then held them scoreless in Game 7. Boston managed just one goal total across those four games, while Kentucky found the goals it needed to stay alive and ultimately complete the comeback.
+
+The series began with Boston in control. The Bandits took Game 1 by a 2–1 score, then won a marathon Game 2, 1–0 in double overtime. Wheels stopped all 42 shots he faced in that Game 2 shutout, while Trizzy scored the overtime winner. Boston then claimed Game 3, 3–2, moving within one win of the Finals and putting Kentucky on the brink of elimination. At 3–0 down, the Mustangs had no margin left: every game from that point forward was a must-win.
+
+Kentucky's response started in Game 4. Oil Country shut out Boston in a 2–0 victory, giving the Mustangs a lifeline and preventing the Bandits from closing the series. Game 5 brought another dramatic finish. Boston and Kentucky traded pressure in a tight contest, and Skyz scored the overtime winner in a 2–1 Kentucky victory. The series was suddenly 3–2, and the team that had looked finished had new life.
+
+Game 6 became another defensive struggle. With the series on the line, Kentucky kept Boston off the scoreboard and finally broke through late. Vial scored with 3:36 remaining, and Kentucky added an empty-net goal to secure a 2–0 win. The Mustangs had won three straight elimination games, tied the series 3–3, and forced the first Game 7 in RMHL history.
+
+Then came the deciding game. The first period ended scoreless, and neither team gave away much space. Skyz's second-period goal at 1:56 remaining supplied the breakthrough Kentucky needed. From there, the Mustangs leaned on their defensive structure and Oil Country's shutout performance. Boston searched for an equalizer, but it never came. The 1–0 final sent Kentucky from the edge of elimination to the Grand Finals.
+
+Across seven games, Kentucky scored 10 goals and Boston scored 7. That works out to 1.43 goals per game for Kentucky, 1.00 for Boston, and 2.43 combined goals per game. The series was defined by defense, with Boston's offense especially stifled late: just one goal in the final four games. Kentucky did not simply win a Game 7; it completely changed the direction of the series after being one loss away from going home.
+
+Now the Mustangs move on to face the San Diego Suns, who swept the Arizona Desert Dogs 4–0 and outscored them 19–2. The Grand Finals begin tomorrow, October 26, and will run through November 1 if all seven games are necessary. San Diego arrives after a dominant sweep; Kentucky arrives after a comeback that will be remembered for years. One team controlled its series from the start. The other refused to let its season end. The stage is set for the RMHL championship.`,
+        date: "October 25, 2026"
+      },
+      15: {
+        id: 15, tag: "Grand Finals Preview", title: "Two Stories, One Final",
+        author: "RMHL Media", snippet: "San Diego arrives after a ruthless sweep. Kentucky arrives after a comeback for the ages. Two completely different journeys lead to one championship series.",
+        full: `Two teams remain. One championship is waiting. But the San Diego Suns and Kentucky Mustangs could hardly have taken more different roads to the RMHL Grand Finals. San Diego made the semifinal round look straightforward, sweeping the Arizona Desert Dogs in four games. Kentucky looked finished after three games against the Boston Bay Bandits, then won four straight elimination games to complete a historic comeback. Now those two stories meet, with Game 1 set for October 26 and the opening odds even at 50/50.
+
+SAN DIEGO: FOUR GAMES, TOTAL CONTROL
+
+The Suns enter the Finals having done almost everything a team could ask of itself. They swept Arizona 4–0, winning 3–0 in Game 1, exploding for an 8–0 shutout in Game 2, taking Game 3 by 4–2, and closing the series with a 4–0 shutout in Game 4. San Diego outscored Arizona 19–2 across the series: 4.75 goals scored per game, just 0.50 allowed per game, and 5.25 total goals per game. The Suns scored more than 90 percent of the goals in the series and recorded three shutouts.
+
+The attack showed it could strike in bunches. Jack_717 opened the postseason with a hat trick in Game 1, while Sharky erupted for seven goals in Game 2's 8–0 demolition. San Diego's offense did not depend on a single narrow path to victory: it could win a low-scoring defensive game or overwhelm an opponent when the chances opened up. The Suns never had to play a fifth game, never faced elimination, and had the luxury of finishing their semifinal early. That efficiency is a major strength—but the Finals will be their first test against a team that has just survived a seven-game war.
+
+KENTUCKY: FROM 0–3 TO THE FINALS
+
+Kentucky's route could not have been more stressful. Boston won the first three games, including a 1–0 double-overtime Game 2 in which Wheels made 42 saves and Trizzy scored the winner. After a 3–2 Game 3 victory, Boston stood one win from advancing and Kentucky was one defeat from elimination. The Mustangs responded with four consecutive wins: a 2–0 Game 4 shutout, a 2–1 overtime win in Game 5, a 2–0 Game 6 victory, and the decisive 1–0 Game 7.
+
+The comeback was built on defense and nerve. Boston scored just one goal across the final four games of the series. Kentucky scored 10 goals over the seven games, an average of 1.43 per game; Boston scored seven, averaging 1.00. The combined average was only 2.43 goals per game. Oil Country delivered the Game 7 shutout, while Skyz became the hero with the game-winning goal at 1:56 remaining in the second period. Skyz had already scored the overtime winner in Game 5, and Vial's late goal in Game 6 helped Kentucky force the first Game 7 in RMHL history. The Mustangs have proven they can win tight, tense games when the season is on the line.
+
+THE MATCHUP: FIREPOWER AGAINST RESILIENCE
+
+San Diego's numbers are the most explosive of the two teams' playoff runs. The Suns averaged 4.75 goals per game in the sweep and allowed half a goal per game. Kentucky's recent form, though, tells a very different story: after Boston raced ahead 3–0, the Mustangs shut down the Bandits and held them to one goal in four games. San Diego's scoring depth will test whether Kentucky can keep another high-powered attack quiet; Kentucky's confidence and defensive discipline will test whether the Suns can stay patient if the game becomes a one-goal battle.
+
+The goaltending matchup is just as compelling. San Diego's shutout-heavy sweep showed how well its defense and netminding can work together. Kentucky reaches the Finals with Oil Country fresh off a shutout in the biggest game of the season so far. The Mustangs have also played under maximum pressure for four straight games, while San Diego has had the cleaner, shorter series. Rest and rhythm favor different teams in different ways: the Suns have had more time to prepare, while the Mustangs have just proved they can survive almost anything.
+
+GAME 1: EVEN ODDS, NO CLEAR FAVORITE
+
+The Game 1 odds are set at 50/50. San Diego's dominant sweep earns respect, but Kentucky's historic comeback makes it impossible to dismiss the Mustangs. The Suns will want to establish their pace early and show that their scoring touch carries over against a tougher opponent. Kentucky will look to keep the game close, trust its defensive structure, and make every opportunity count. If the opener turns into a shootout, San Diego's semifinal scoring numbers loom large. If it becomes a low-scoring grind, Kentucky has just shown how comfortable it can be in that kind of game.
+
+One team swept its way here. The other won four straight with its season on the line. San Diego brings the firepower; Kentucky brings the belief that it is never out of a series. Their paths were different, but the destination is the same: the RMHL championship. Two stories. One final. Game 1 begins October 26.`,
+        date: "October 26, 2026"
+      }
+    };
+
+    function renderStandings() {
+      const tbody = document.getElementById('standings-table-body');
+      tbody.innerHTML = '';
+      
+      standingsData.forEach((team, index) => {
+        const info = TEAMS[team.code];
+        const tr = document.createElement('tr');
+        tr.className = 'hover:bg-gray-800/40 transition';
+        tr.innerHTML = `
+          <td class="py-3 px-3 text-center font-display font-bold text-gray-300">${index + 1}</td>
+          <td class="py-3 px-4">
+            <div class="flex items-center space-x-2.5">
+              ${getTeamLogoSVG(info.abbr, info.color, info.textColor)}
+              <div>
+                <span class="font-bold text-white">${info.name}</span>
+                ${team.note ? `<span class="block text-[10px] text-emerald-400 font-normal">${team.note}</span>` : ''}
+              </div>
+            </div>
+          </td>
+          <td class="py-3 px-2 text-center text-gray-300">${team.gp}</td>
+          <td class="py-3 px-2 text-center text-emerald-400 font-semibold">${team.rw}</td>
+          <td class="py-3 px-2 text-center text-emerald-300">${team.otw}</td>
+          <td class="py-3 px-2 text-center text-amber-400">${team.otl}</td>
+          <td class="py-3 px-2 text-center text-red-400">${team.l}</td>
+          <td class="py-3 px-4 text-center font-display font-black text-white text-sm sm:text-base" style="background-color: ${info.color}15;">${team.pts}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderSchedule() {
+      const container = document.getElementById('schedule-container');
+      container.innerHTML = '';
+
+      const grouped = {};
+      Object.values(gamesData).forEach(g => {
+        const dateKey = g.date.split('•')[0].trim();
+        if (!grouped[dateKey]) grouped[dateKey] = [];
+        grouped[dateKey].push(g);
+      });
+
+      Object.keys(grouped).forEach(date => {
+        const card = document.createElement('div');
+        const firstGame = grouped[date][0];
+        const categoryLabels = { regular: 'REGULAR SEASON', semifinals: 'SEMIFINALS', finals: 'FINALS' };
+        
+        card.className = `fixture-card match-${firstGame.cat} bg-[#121620] p-4 sm:p-5 rounded-xl border border-[#1f293d] space-y-3 card-hover-lift`;
+        
+        let matchesHtml = '';
+        grouped[date].forEach(g => {
+          const tA = TEAMS[g.teamA];
+          const tB = TEAMS[g.teamB];
+          const sumA = g.periodsA.reduce((a, b) => a + b, 0);
+          const sumB = g.periodsB.reduce((a, b) => a + b, 0);
+
+          let badgeIcon;
+          if (g.status.startsWith('FINAL') && g.winner && TEAMS[g.winner]) {
+            const wTeam = TEAMS[g.winner];
+            badgeIcon = getTeamLogoSVG(wTeam.abbr, wTeam.color, wTeam.textColor, 'w-7 h-7 sm:w-8 sm:h-8');
+          } else {
+            badgeIcon = getDiagonalMatchSquareSVG(tA.color, tB.color);
+          }
+
+          if (g.status.startsWith('FINAL')) {
+            matchesHtml += `
+              <div onclick="openMatchModal('${g.id}')" class="flex items-center justify-between p-3 sm:p-3.5 rounded-lg bg-emerald-950/20 border border-emerald-500/40 hover:border-emerald-400 cursor-pointer transition group">
+                <div class="flex items-center space-x-2.5">
+                  ${badgeIcon}
+                  <span class="font-bold text-white text-xs sm:text-sm">${tA.name} <span class="text-xs text-gray-400 font-normal">vs</span> ${tB.name}</span>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <span class="text-[10px] sm:text-xs font-bold text-emerald-400 uppercase bg-emerald-900/40 px-2 py-0.5 rounded border border-emerald-500/30">${g.status} ${sumA}-${sumB}</span>
+                  <i class="fa-solid fa-chevron-right text-xs text-emerald-500 group-hover:translate-x-0.5 transition-transform"></i>
+                </div>
+              </div>
+            `;
+          } else {
+            matchesHtml += `
+              <div onclick="openMatchModal('${g.id}')" class="flex items-center justify-between p-3 sm:p-3.5 rounded-lg bg-gray-900/50 border border-gray-800 hover:border-[#ff2a4b]/50 cursor-pointer transition group">
+                <div class="flex items-center space-x-2.5">
+                  ${badgeIcon}
+                  <div>
+                    <span class="font-bold text-white text-xs sm:text-sm">${tA.name} <span class="text-xs text-gray-400 font-normal">vs</span> ${tB.name}</span>
+                  </div>
+                </div>
+                <div class="flex items-center space-x-2">
+                  <span class="text-xs font-mono font-bold text-gray-300">${g.status}</span>
+                  <i class="fa-solid fa-chevron-right text-xs text-gray-500 group-hover:translate-x-0.5 transition-transform"></i>
+                </div>
+              </div>
+            `;
+          }
+        });
+
+        card.innerHTML = `
+          <div class="flex items-center justify-between border-b border-[#1f293d] pb-2 text-[11px] sm:text-xs font-bold text-gray-400 uppercase tracking-wider">
+            <span><i class="fa-solid fa-calendar mr-1.5 text-[#ff2a4b]"></i>${date}</span>
+            <span class="text-[#ff2a4b]">${categoryLabels[firstGame.cat] || firstGame.cat.toUpperCase()}</span>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 pt-1">
+            ${matchesHtml}
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function renderHomeFeaturedGames() {
+      const game3Container = document.getElementById('home-game3-results');
+      const game4Container = document.getElementById('home-game4-previews');
+      
+      if (game3Container) game3Container.innerHTML = '';
+      if (game4Container) game4Container.innerHTML = '';
+
+      // Game 7 Final Score Card
+      ['g7_ky_bos'].forEach(id => {
+        const g = gamesData[id];
+        if (!g || !game3Container) return;
+
+        const tA = TEAMS[g.teamA];
+        const tB = TEAMS[g.teamB];
+        const sumA = g.periodsA.reduce((a, b) => a + b, 0);
+        const sumB = g.periodsB.reduce((a, b) => a + b, 0);
+
+        const card = document.createElement('div');
+        card.onclick = () => openMatchModal(g.id);
+        card.className = 'card-hover-lift bg-[#121620] p-5 rounded-xl border border-[#1f293d] hover:border-[#ff2a4b]/50 transition cursor-pointer group shadow-lg space-y-3';
+
+        card.innerHTML = `
+          <div class="flex justify-between items-center text-xs font-semibold text-gray-400">
+            <span><i class="fa-solid fa-calendar mr-1 text-[#ff2a4b]"></i>${g.date}</span>
+            <span class="px-2 py-0.5 rounded ${g.status.startsWith('FINAL') ? 'bg-emerald-950/60 text-emerald-400 border-emerald-500/40' : 'bg-gray-800 text-gray-300 border-gray-700'} font-bold text-[10px] uppercase border">${g.status}</span>
+          </div>
+          <div class="flex items-center justify-between py-1">
+            <div class="flex items-center space-x-3 w-5/12">
+              ${getTeamLogoSVG(tA.abbr, tA.color, tA.textColor, 'w-9 h-9 sm:w-10 sm:h-10')}
+              <span class="font-bold text-white text-xs sm:text-sm truncate">${tA.name}</span>
+            </div>
+            <div class="font-display font-black text-xl text-white">
+              ${g.status.startsWith('FINAL') ? `${sumA} - ${sumB}` : 'VS'}
+            </div>
+            <div class="flex items-center space-x-3 w-5/12 justify-end">
+              <span class="font-bold text-white text-xs sm:text-sm truncate text-right">${tB.name}</span>
+              ${getTeamLogoSVG(tB.abbr, tB.color, tB.textColor, 'w-9 h-9 sm:w-10 sm:h-10')}
+            </div>
+          </div>
+          ${g.seriesLead ? `<div class="text-[11px] font-medium text-gray-400 text-center pt-1 border-t border-[#1f293d]/50">${g.seriesLead}</div>` : ''}
+        `;
+        game3Container.appendChild(card);
+      });
+
+      // Grand Finals Game 1 Preview Card
+      ['gf_g1'].forEach(id => {
+        const g = gamesData[id];
+        if (!g || !game4Container) return;
+
+        const tA = TEAMS[g.teamA];
+        const tB = TEAMS[g.teamB];
+
+        const card = document.createElement('div');
+        card.onclick = () => openMatchModal(g.id);
+        card.className = 'card-hover-lift bg-[#121620] p-5 sm:p-6 rounded-xl border border-[#ff2a4b]/40 hover:border-[#ff2a4b] transition cursor-pointer group shadow-lg space-y-4';
+
+        card.innerHTML = `
+          <div class="text-xs text-center text-gray-400 uppercase tracking-widest font-semibold flex justify-between items-center">
+            <span class="text-[#ff2a4b] font-bold"><i class="fa-solid fa-clock mr-1"></i>${g.date} • ${g.status}</span>
+          </div>
+
+          <div class="flex items-center justify-between">
+            <div class="flex flex-col items-center w-2/5 text-center">
+              ${getTeamLogoSVG(tA.abbr, tA.color, tA.textColor, 'w-12 h-12 sm:w-14 sm:h-14 mb-2')}
+              <span class="text-xs sm:text-sm font-bold text-white truncate w-full">${tA.name}</span>
+            </div>
+            
+            <div class="text-center">
+              <div class="font-display font-black text-gray-500 text-sm">${g.status.startsWith('FINAL') ? `${g.periodsA.reduce((a,b)=>a+b,0)} - ${g.periodsB.reduce((a,b)=>a+b,0)}` : 'VS'}</div>
+            </div>
+
+            <div class="flex flex-col items-center w-2/5 text-center">
+              ${getTeamLogoSVG(tB.abbr, tB.color, tB.textColor, 'w-12 h-12 sm:w-14 sm:h-14 mb-2')}
+              <span class="text-xs sm:text-sm font-bold text-white truncate w-full">${tB.name}</span>
+            </div>
+          </div>
+
+          ${g.seriesLead ? `<div class="text-[11px] font-medium text-gray-400 text-center">${g.seriesLead}</div>` : ''}
+
+          ${g.oddsA != null && g.oddsB != null ? `
+          <div class="space-y-1.5 pt-1">
+            <div class="flex justify-between text-[11px] font-bold">
+              <span style="color: ${tA.color}">${tA.abbr} ${g.oddsA}%</span>
+              <span style="color: ${tB.color}">${tB.abbr} ${g.oddsB}%</span>
+            </div>
+            <div class="w-full h-2.5 bg-gray-900 rounded-full overflow-hidden flex border border-gray-800">
+              <div style="width: ${g.oddsA}%; background-color: ${tA.color}"></div>
+              <div style="width: ${g.oddsB}%; background-color: ${tB.color}"></div>
+            </div>
+          </div>` : ''}
+        `;
+        game4Container.appendChild(card);
+      });
+    }
+
+    function renderArticles() {
+      const homeArt = document.getElementById('home-articles-container');
+      const mediaGrid = document.getElementById('media-articles-grid');
+
+      if (homeArt) homeArt.innerHTML = '';
+      if (mediaGrid) mediaGrid.innerHTML = '';
+
+      // HOME PAGE: Render the latest Game 7 recap
+      const homeArticleIds = [15, 14];
+
+      Object.values(articleData).forEach(art => {
+        const authorText = art.author ? art.author : "RMHL Media";
+
+        // Home Tab Render
+        if (homeArt && homeArticleIds.includes(art.id)) {
+          const div = document.createElement('div');
+          div.id = `article-${art.id}`;
+          div.onclick = () => openArticleModal(art.id);
+          div.className = 'card-hover-lift bg-[#121620] rounded-xl border border-[#1f293d] hover:border-[#ff2a4b]/50 overflow-hidden flex flex-col justify-between cursor-pointer transition p-4 sm:p-5 space-y-3.5';
+          div.innerHTML = `
+            <div class="space-y-2.5">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold text-white bg-[#ff2a4b] px-2 py-0.5 rounded uppercase tracking-wider shadow-md">${art.tag}</span>
+                <span class="text-[10px] sm:text-[11px] text-gray-500">${art.date}</span>
+              </div>
+              <h3 class="font-display font-bold text-sm sm:text-base text-white leading-snug">${art.title}</h3>
+              <p class="article-text text-xs text-gray-400 leading-relaxed">${art.snippet}</p>
+            </div>
+            <div class="pt-2.5 border-t border-[#1f293d]/50 flex justify-between items-center text-[10px] sm:text-[11px] text-gray-500 font-medium">
+              <span>${authorText}</span>
+              <span class="text-[#ff2a4b] font-bold">Read Full Article &rarr;</span>
+            </div>
+          `;
+          homeArt.appendChild(div);
+        }
+
+        // Media Grid Render (All Articles)
+        if (mediaGrid) {
+          const mDiv = document.createElement('div');
+          mDiv.id = `media-article-${art.id}`;
+          mDiv.onclick = () => openArticleModal(art.id);
+          mDiv.className = 'media-card card-hover-lift bg-[#121620] rounded-xl border border-[#1f293d] hover:border-[#ff2a4b]/50 overflow-hidden flex flex-col justify-between cursor-pointer transition p-4 sm:p-5 space-y-3.5';
+          mDiv.innerHTML = `
+            <div class="space-y-2.5">
+              <div class="flex items-center justify-between">
+                <span class="text-[10px] font-bold text-white bg-[#ff2a4b] px-2 py-0.5 rounded uppercase tracking-wider shadow-md">${art.tag}</span>
+                <span class="text-[10px] sm:text-[11px] text-gray-500">${art.date}</span>
+              </div>
+              <h3 class="font-display font-bold text-sm sm:text-base text-white leading-snug">${art.title}</h3>
+              <p class="media-article-text text-xs text-gray-400 leading-relaxed">${art.snippet}</p>
+            </div>
+            <div class="pt-2.5 border-t border-[#1f293d]/50 flex justify-between items-center text-[10px] sm:text-[11px] text-gray-500 font-medium">
+              <span>${authorText}</span>
+              <span class="text-[#ff2a4b] font-bold">Read Full Article &rarr;</span>
+            </div>
+          `;
+          mediaGrid.appendChild(mDiv);
+        }
+      });
+    }
+
+    function openArticleModal(artId) {
+      const art = articleData[artId];
+      if (!art) return;
+
+      document.getElementById('article-modal-tag').innerText = art.tag;
+      document.getElementById('article-modal-date').innerText = art.date;
+      document.getElementById('article-modal-title').innerText = art.title;
+      document.getElementById('article-modal-author').innerText = `By ${art.author || 'RMHL Media'}`;
+      document.getElementById('article-modal-body').innerText = art.full;
+
+      document.getElementById('article-modal').classList.remove('hidden');
+    }
+
+    function closeArticleModal() {
+      document.getElementById('article-modal').classList.add('hidden');
+    }
+
+    function filterScheduleSearch() {
+      const query = document.getElementById('schedule-search').value.toLowerCase();
+      const cards = document.querySelectorAll('.fixture-card');
+
+      cards.forEach(card => {
+        const text = card.innerText.toLowerCase();
+        if (text.includes(query)) {
+          card.classList.remove('hidden');
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+    }
+
+    function filterMediaSearch() {
+      const query = document.getElementById('media-search').value.toLowerCase();
+      const cards = document.querySelectorAll('.media-card');
+
+      cards.forEach(card => {
+        const text = card.innerText.toLowerCase();
+        if (text.includes(query)) {
+          card.classList.remove('hidden');
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+    }
+
+    function openMatchModal(gameId) {
+      const g = gamesData[gameId];
+      if (!g) return;
+
+      const tA = TEAMS[g.teamA];
+      const tB = TEAMS[g.teamB];
+
+      document.getElementById('modal-match-date').innerText = g.date;
+      document.getElementById('modal-series-info').innerText = g.stage;
+      document.getElementById('modal-team-a-name').innerText = tA.name;
+      document.getElementById('modal-team-b-name').innerText = tB.name;
+
+      const iconA = document.getElementById('modal-team-a-icon');
+      iconA.innerHTML = getTeamLogoSVG(tA.abbr, tA.color, tA.textColor, 'w-12 h-12 sm:w-14 sm:h-14');
+
+      const iconB = document.getElementById('modal-team-b-icon');
+      iconB.innerHTML = getTeamLogoSVG(tB.abbr, tB.color, tB.textColor, 'w-12 h-12 sm:w-14 sm:h-14');
+
+      const sumA = g.periodsA.reduce((a, b) => a + b, 0);
+      const sumB = g.periodsB.reduce((a, b) => a + b, 0);
+
+      const statusBadge = document.getElementById('modal-status-badge');
+      const boxscoreHeaders = document.getElementById('modal-boxscore-headers');
+      const boxscoreBody = document.getElementById('modal-boxscore-body');
+      
+      const oddsContainer = document.getElementById('modal-odds-bar-container');
+      const oddsLblA = document.getElementById('modal-odds-team-a-lbl');
+      const oddsLblB = document.getElementById('modal-odds-team-b-lbl');
+      const oddsBarA = document.getElementById('modal-odds-bar-a');
+      const oddsBarB = document.getElementById('modal-odds-bar-b');
+
+      const articleLinkContainer = document.getElementById('modal-article-link-container');
+      const articleBtn = document.getElementById('modal-article-btn');
+
+      if (g.status.startsWith('FINAL')) {
+        document.getElementById('modal-score-a').innerText = sumA;
+        document.getElementById('modal-score-a').classList.remove('hidden');
+        document.getElementById('modal-score-b').innerText = sumB;
+        document.getElementById('modal-score-b').classList.remove('hidden');
+
+        statusBadge.innerText = g.status;
+        statusBadge.className = 'px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[10px] font-bold uppercase border border-emerald-500/40';
+        
+        oddsContainer.classList.add('hidden');
+
+        // Dynamically build period header columns
+        let headersHtml = `<th class="py-2 px-3 text-left">Team</th>`;
+        g.periodsA.forEach((_, idx) => {
+          let label = `${idx + 1}st`;
+          if (idx === 1) label = '2nd';
+          else if (idx === 2) label = '3rd';
+          else if (idx === 3) label = 'OT';
+          else if (idx >= 4) label = `${idx - 2}OT`;
+          headersHtml += `<th class="py-2 px-2">${label}</th>`;
+        });
+        headersHtml += `<th class="py-2 px-3 font-bold text-white">TOT</th>`;
+        boxscoreHeaders.innerHTML = headersHtml;
+
+        // Dynamically build period score cells
+        let cellsA = g.periodsA.map(p => `<td class="py-2 px-2">${p}</td>`).join('');
+        let cellsB = g.periodsB.map(p => `<td class="py-2 px-2">${p}</td>`).join('');
+
+        boxscoreBody.innerHTML = `
+          <tr class="${g.winner === g.teamA ? 'text-emerald-400 font-bold' : 'text-gray-300'}">
+            <td class="py-2 px-3 text-left font-bold">${tA.abbr}</td>
+            ${cellsA}
+            <td class="py-2 px-3 font-bold text-emerald-400 text-sm">${sumA}</td>
+          </tr>
+          <tr class="${g.winner === g.teamB ? 'text-emerald-400 font-bold' : 'text-gray-400'}">
+            <td class="py-2 px-3 text-left font-bold">${tB.abbr}</td>
+            ${cellsB}
+            <td class="py-2 px-3 font-bold text-gray-300 text-sm">${sumB}</td>
+          </tr>
+        `;
+
+        if (g.articleId) {
+          articleLinkContainer.classList.remove('hidden');
+          articleBtn.onclick = () => {
+            closeMatchPreview();
+            closeSeriesOverview();
+            openArticleModal(g.articleId);
+          };
+        } else {
+          articleLinkContainer.classList.add('hidden');
+        }
+
+      } else {
+        document.getElementById('modal-score-a').classList.add('hidden');
+        document.getElementById('modal-score-b').classList.add('hidden');
+        articleLinkContainer.classList.add('hidden');
+
+        statusBadge.innerText = g.status;
+        statusBadge.className = 'px-2 py-0.5 rounded bg-[#ff2a4b]/10 text-[#ff2a4b] text-[10px] font-bold uppercase border border-[#ff2a4b]/30';
+
+        boxscoreHeaders.innerHTML = `
+          <th class="py-2 px-3 text-left">Team</th>
+          <th class="py-2 px-2">1st</th>
+          <th class="py-2 px-2">2nd</th>
+          <th class="py-2 px-3">3rd</th>
+          <th class="py-2 px-3 font-bold text-white">TOT</th>
+        `;
+
+        if (g.oddsA !== null && g.oddsB !== null) {
+          oddsLblA.innerText = `${tA.abbr} ${g.oddsA}%`;
+          oddsLblA.style.color = tA.color;
+          oddsLblB.innerText = `${tB.abbr} ${g.oddsB}%`;
+          oddsLblB.style.color = tB.color;
+
+          oddsBarA.style.width = `${g.oddsA}%`;
+          oddsBarA.style.backgroundColor = tA.color;
+          oddsBarB.style.width = `${g.oddsB}%`;
+          oddsBarB.style.backgroundColor = tB.color;
+
+          oddsContainer.classList.remove('hidden');
+        } else {
+          oddsContainer.classList.add('hidden');
+        }
+
+        boxscoreBody.innerHTML = `
+          <tr class="text-gray-300">
+            <td class="py-2 px-3 text-left font-bold">${tA.abbr}</td>
+            <td class="py-2 px-2 text-gray-500">-</td>
+            <td class="py-2 px-2 text-gray-500">-</td>
+            <td class="py-2 px-2 text-gray-500">-</td>
+            <td class="py-2 px-3 font-bold text-gray-400">0</td>
+          </tr>
+          <tr class="text-gray-300">
+            <td class="py-2 px-3 text-left font-bold">${tB.abbr}</td>
+            <td class="py-2 px-2 text-gray-500">-</td>
+            <td class="py-2 px-2 text-gray-500">-</td>
+            <td class="py-2 px-2 text-gray-500">-</td>
+            <td class="py-2 px-3 font-bold text-gray-400">0</td>
+          </tr>
+        `;
+      }
+
+      document.getElementById('modal-series-lead-text').innerText = g.seriesLead || 'Series Matchup';
+      document.getElementById('match-modal').classList.remove('hidden');
+    }
+
+    function closeMatchPreview() {
+      document.getElementById('match-modal').classList.add('hidden');
+    }
+
+    function openSeriesOverview(sId) {
+      const series = seriesData[sId];
+      if (!series) return;
+
+      document.getElementById('series-modal-title').innerText = series.title;
+      document.getElementById('series-modal-lead').innerText = series.lead;
+
+      const listContainer = document.getElementById('series-games-list');
+      listContainer.innerHTML = '';
+
+      series.gameIds.forEach(gId => {
+        const g = gamesData[gId];
+        if (!g) return;
+
+        const tA = TEAMS[g.teamA];
+        const tB = TEAMS[g.teamB];
+        const sumA = g.periodsA.reduce((a, b) => a + b, 0);
+        const sumB = g.periodsB.reduce((a, b) => a + b, 0);
+
+        const row = document.createElement('div');
+        row.onclick = () => openMatchModal(g.id);
+
+        let badgeIcon;
+        if (g.status.startsWith('FINAL') && g.winner && TEAMS[g.winner]) {
+          const wTeam = TEAMS[g.winner];
+          badgeIcon = getTeamLogoSVG(wTeam.abbr, wTeam.color, wTeam.textColor, 'w-8 h-8');
+        } else {
+          badgeIcon = getDiagonalMatchSquareSVG(tA.color, tB.color, 'w-8 h-8');
+        }
+
+        if (g.status.startsWith('FINAL')) {
+          row.className = 'flex items-center justify-between p-3 rounded-xl bg-emerald-950/20 border border-emerald-500/40 hover:border-emerald-400 cursor-pointer transition group';
+          row.innerHTML = `
+            <div class="flex items-center space-x-3">
+              ${badgeIcon}
+              <div>
+                <span class="text-[10px] font-bold text-[#ff2a4b] uppercase tracking-wider block">${g.stage}</span>
+                <span class="font-bold text-white text-xs sm:text-sm">${tA.name} <span class="text-xs text-gray-400 font-normal">vs</span> ${tB.name}</span>
+              </div>
+            </div>
+            <div class="flex items-center space-x-2.5">
+              <span class="text-xs font-mono font-black text-emerald-400 bg-emerald-900/40 px-2 py-1 rounded border border-emerald-500/30">${g.status} ${sumA}-${sumB}</span>
+              <i class="fa-solid fa-chevron-right text-xs text-emerald-500 group-hover:translate-x-0.5 transition-transform"></i>
+            </div>
+          `;
+        } else {
+          row.className = 'flex items-center justify-between p-3 rounded-xl bg-gray-900/50 border border-gray-800 hover:border-[#ff2a4b]/50 cursor-pointer transition group';
+          row.innerHTML = `
+            <div class="flex items-center space-x-3">
+              ${badgeIcon}
+              <div>
+                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider block">${g.stage}</span>
+                <span class="font-bold text-white text-xs sm:text-sm">${tA.name} <span class="text-xs text-gray-400 font-normal">vs</span> ${tB.name}</span>
+              </div>
+            </div>
+            <div class="flex items-center space-x-2.5">
+              <span class="text-xs font-mono font-bold text-gray-300 bg-gray-800 px-2 py-1 rounded border border-gray-700">${g.status}</span>
+              <i class="fa-solid fa-chevron-right text-xs text-gray-500 group-hover:translate-x-0.5 transition-transform"></i>
+            </div>
+          `;
+        }
+
+        listContainer.appendChild(row);
+      });
+
+      document.getElementById('series-modal').classList.remove('hidden');
+    }
+
+    function closeSeriesOverview() {
+      document.getElementById('series-modal').classList.add('hidden');
+    }
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.add('hidden'));
+
+      const selectedTab = document.getElementById(`tab-${tabId}`);
+      if (selectedTab) selectedTab.classList.remove('hidden');
+
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.className = "nav-btn px-3.5 py-2 rounded-lg font-medium text-xs lg:text-sm transition-all duration-200 text-gray-400 hover:text-white hover:bg-gray-800/50";
+      });
+
+      const activeNav = document.getElementById(`nav-${tabId}`);
+      if (activeNav) {
+        activeNav.className = "nav-btn px-3.5 py-2 rounded-lg font-medium text-xs lg:text-sm transition-all duration-200 text-white bg-[#ff2a4b]/20 border border-[#ff2a4b]/40";
+      }
+
+      const mobileMenu = document.getElementById('mobile-menu');
+      if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
+        mobileMenu.classList.add('hidden');
+      }
+    }
+
+    function toggleMobileMenu() {
+      const mobileMenu = document.getElementById('mobile-menu');
+      if (mobileMenu) mobileMenu.classList.toggle('hidden');
+    }
+
+    function filterSchedule(category) {
+      const cards = document.querySelectorAll('.fixture-card');
+      ['all', 'semifinals', 'finals'].forEach(btn => {
+        const el = document.getElementById(`sched-filter-${btn}`);
+        if (el) el.className = "px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg text-gray-400 hover:text-white";
+      });
+
+      const activeBtn = document.getElementById(`sched-filter-${category}`);
+      if (activeBtn) activeBtn.className = "px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-lg bg-[#ff2a4b] text-white";
+
+      cards.forEach(card => {
+        if (category === 'all' || card.classList.contains(`match-${category}`)) {
+          card.classList.remove('hidden');
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      renderStandings();
+      renderSchedule();
+      renderHomeFeaturedGames();
+      renderArticles();
+
+      document.getElementById('bracket-logo-sd').innerHTML = getTeamLogoSVG('SD', TEAMS.SD.color, TEAMS.SD.textColor, 'w-6 h-6');
+      document.getElementById('bracket-logo-ari').innerHTML = getTeamLogoSVG('ARI', TEAMS.ARI.color, TEAMS.ARI.textColor, 'w-6 h-6');
+      document.getElementById('bracket-logo-bos').innerHTML = getTeamLogoSVG('BOS', TEAMS.BOS.color, TEAMS.BOS.textColor, 'w-6 h-6');
+      document.getElementById('bracket-logo-ky').innerHTML = getTeamLogoSVG('KY', TEAMS.KY.color, TEAMS.KY.textColor, 'w-6 h-6');
+    });
+  </script>
+</body>
+</html>
